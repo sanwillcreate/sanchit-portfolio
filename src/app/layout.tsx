@@ -9,6 +9,7 @@ import {
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import ThemeProvider from "@/components/ThemeProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 const geist = Geist({
   variable: "--font-geist",
@@ -59,6 +60,7 @@ export default function RootLayout({
         className={`${geist.variable} ${geistMono.variable} ${bricolage.variable} ${hanken.variable} ${jetbrains.variable}`}
       >
         <ThemeProvider>{children}</ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
