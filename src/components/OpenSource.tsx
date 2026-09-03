@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type ContributionDay = {
   contributionCount: number;
@@ -22,6 +22,8 @@ export default function OpenSource() {
   const [activity, setActivity] = useState<GithubActivity | null>(null);
   const [error, setError] = useState(false);
 
+  const graphRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     fetch("/api/github/activity")
       .then((res) => {
@@ -34,6 +36,18 @@ export default function OpenSource() {
       .then((data) => setActivity(data))
       .catch(() => setError(true));
   }, []);
+
+  // Start the contribution graph at the most recent contributions on mobile
+  useEffect(() => {
+    if (!activity || !graphRef.current) {
+      return;
+    }
+
+    if (window.innerWidth < 640) {
+      graphRef.current.scrollLeft =
+        graphRef.current.scrollWidth - graphRef.current.clientWidth;
+    }
+  }, [activity]);
 
   return (
     <section className="px-6 py-24 sm:py-32">
@@ -101,11 +115,14 @@ export default function OpenSource() {
 
             {/* Contribution graph */}
             <div className="mt-10">
-              {/* 
+              {/*
                 Only this area scrolls horizontally.
-                The rest of the section stays fixed on mobile.
+                On mobile, it starts at the most recent contributions.
               */}
-              <div className="overflow-x-auto overscroll-x-contain pb-3">
+              <div
+                ref={graphRef}
+                className="overflow-x-auto overscroll-x-contain pb-3"
+              >
                 <div className="w-max min-w-[760px]">
                   {/* Month labels */}
                   <div className="mb-3 flex">
